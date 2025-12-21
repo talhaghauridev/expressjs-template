@@ -4,3 +4,5 @@ function bad(param: any) {
   console.log({ param });
 } // → Error: Avoid using 'any'
 bad({});
+
+const fine = 'Talha';
