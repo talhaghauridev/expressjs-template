@@ -1,5 +1,5 @@
-import { HTTP_STATUS } from './httpStatus';
-import { ResponseMessages } from '@/constants/responseMessages';
+import { HTTP_STATUS } from './http-status';
+import { ResponseMessages } from '@/constants/response-messages';
 import { Response } from 'express';
 
 class ApiResponse<T> {

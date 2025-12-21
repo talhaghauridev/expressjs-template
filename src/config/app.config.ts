@@ -1,5 +1,5 @@
+import { env } from '@/env';
 import compression, { CompressionOptions } from 'compression';
-import { env } from '../env';
 import { CorsOptions } from 'cors';
 import { HelmetOptions } from 'helmet';
 

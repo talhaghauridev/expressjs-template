@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import errorMiddleware from '@/middlewares/error.middleware';
 import { config } from '@/config/app.config';
+import ApiError from './utils/api-error';
 
 const app = express();
 

@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { PostgresError } from 'postgres';
 import { env } from '@/env';
-import ApiError from '@/utils/ApiError';
-import handlePostgresError from '@/utils/handlePostgressError';
+import ApiError from '@/utils/api-error';
+import handlePostgresError from '@/utils/handle-postgres-error';
 
 const errorMiddleware = (
   err: Error | ApiError | PostgresError,

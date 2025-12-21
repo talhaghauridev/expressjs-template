@@ -40,7 +40,6 @@ const AUTH_MESSAGES = {
   PASSWORD_CHANGE_FAILED: 'Failed to change password',
 };
 
-// User Response Messages
 const USER_MESSAGES = {
   USER_FOUND: 'User found',
   USER_NOT_FOUND: 'User not found',
@@ -50,19 +49,14 @@ const USER_MESSAGES = {
   INVALID_USER_DATA: 'Invalid user data provided',
 };
 
-// Validation Response Messages
 const VALIDATION_MESSAGES = {
-  REQUIRED_FIELD: 'This field is required',
-  INVALID_EMAIL: 'Please provide a valid email address',
-  INVALID_PASSWORD: 'Password must be at least 8 characters long',
-  INVALID_PLATFORM: 'Platform must be one of: web, mobile, desktop',
-  INVALID_REDIRECT_URL: 'Invalid redirect URL',
-  INVALID_STATE: 'Invalid authentication state',
-  STATE_EXPIRED: 'Authentication state expired',
-  PLATFORM_MISMATCH: 'Platform mismatch',
+  REQUIRED: (field: string) => `${field} is required`,
+  INVALID_EMAIL: 'Invalid email format',
+  MIN_LENGTH: (field: string, min: number) => `${field} must be at least ${min} characters`,
+  MAX_LENGTH: (field: string, max: number) => `${field} must be at most ${max} characters`,
+  INVALID_FORMAT: (field: string) => `Invalid ${field} format`,
 };
 
-// Error Response Messages
 const ERROR_MESSAGES = {
   DATABASE_ERROR: 'Database error occurred',
   UNAUTHORIZED: 'Unauthorized access',
@@ -79,7 +73,6 @@ const ERROR_MESSAGES = {
   SERVICE_UNAVAILABLE: 'Service temporarily unavailable',
 };
 
-// Success Response Messages
 const SUCCESS_MESSAGES = {
   OPERATION_SUCCESS: 'Operation completed successfully',
   DATA_RETRIEVED: 'Data retrieved successfully',

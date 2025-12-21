@@ -1,5 +1,5 @@
 import { PostgresError } from 'postgres';
-import ApiError from './ApiError';
+import ApiError from './api-error';
 
 const handlePostgresError = (error: PostgresError) => {
   switch (error.code) {
