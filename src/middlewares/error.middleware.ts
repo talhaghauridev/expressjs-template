@@ -3,6 +3,7 @@ import { PostgresError } from 'postgres';
 import { env } from '@/env';
 import ApiError from '@/utils/api-error';
 import handlePostgresError from '@/utils/handle-postgres-error';
+import logger from '@/utils/logger';
 
 const errorMiddleware = (
   err: Error | ApiError | PostgresError,
@@ -12,7 +13,7 @@ const errorMiddleware = (
 ) => {
   let error = err;
 
-  console.log('Error :', err);
+  logger.error(err);
 
   if ('code' in err && typeof err.code === 'string') {
     error = handlePostgresError(err as PostgresError);

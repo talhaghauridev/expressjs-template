@@ -1,14 +1,15 @@
 import app from './app';
 import { env } from './env';
+import logger from './utils/logger';
 
 const server = app.listen(env.PORT, () => {
-  console.log(
+  logger.info(
     `Server is running on http://localhost:${env.PORT} in ${env.NODE_ENV.toUpperCase()} mode`
   );
 });
 
 const shutdown = (signal: string) => {
-  console.log(`\n${signal} received: closing server...`);
+  logger.warn(`\n${signal} received: closing server...`);
   server.close(() => {
     console.log('Server closed.');
     process.exit(0);
