@@ -6,6 +6,7 @@ import compression from 'compression';
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
+import routes from '@/routes';
 
 const app = express();
 
@@ -16,6 +17,9 @@ app.use(bodyParser.json());
 app.use(compression(config.compression));
 app.use(cors(config.cors));
 app.use(morganMiddleware);
+
+app.use('/api/v1', routes);
+
 app.get('/', async (req, res) => {
   return res.status(200).json({
     message: 'Server is running',

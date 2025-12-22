@@ -52,9 +52,20 @@ const USER_MESSAGES = {
 const VALIDATION_MESSAGES = {
   REQUIRED: (field: string) => `${field} is required`,
   INVALID_EMAIL: 'Invalid email format',
-  MIN_LENGTH: (field: string, min: number) => `${field} must be at least ${min} characters`,
-  MAX_LENGTH: (field: string, max: number) => `${field} must be at most ${max} characters`,
+  INVALID_DATE: 'Invalid date format',
+  MIN_LENGTH: (field: string, min: number) => `${field} must be at least ${min} characters long`,
+  MAX_LENGTH: (field: string, max: number) => `${field} must be at most ${max} characters long`,
   INVALID_FORMAT: (field: string) => `Invalid ${field} format`,
+
+  MUST_BE_STRING: (field: string) => `${field} must be a string`,
+  MUST_BE_NUMBER: (field: string) => `${field} must be a number`,
+  MUST_BE_BOOLEAN: (field: string) => `${field} must be a boolean`,
+  MUST_BE_OBJECT: (field: string) => `${field} must be an object`,
+  MUST_BE_ARRAY: (field: string) => `${field} must be an array`,
+
+  MUST_BE_DATE: (field: string) => `${field} must be a valid date`,
+  VALUE_TOO_SMALL: (field: string, min: number) => `${field} must be at least ${min}`,
+  VALUE_TOO_LARGE: (field: string, max: number) => `${field} must be at most ${max}`,
 };
 
 const ERROR_MESSAGES = {

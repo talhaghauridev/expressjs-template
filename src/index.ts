@@ -9,9 +9,9 @@ const server = app.listen(env.PORT, () => {
 });
 
 const shutdown = (signal: string) => {
-  logger.warn(`\n${signal} received: closing server...`);
+  logger.error(`\n${signal} received: closing server...`);
   server.close(() => {
-    console.log('Server closed.');
+    logger.info('Server closed.');
     process.exit(0);
   });
 };

@@ -13,7 +13,9 @@ const errorMiddleware = (
 ) => {
   let error = err;
 
-  logger.error(err);
+  if (env.NODE_ENV !== 'production') {
+    logger.error(err);
+  }
 
   if ('code' in err && typeof err.code === 'string') {
     error = handlePostgresError(err as PostgresError);
