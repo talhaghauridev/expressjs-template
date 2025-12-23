@@ -2,7 +2,7 @@ import { env } from '@/env';
 import { createLogger, format, transports } from 'winston';
 const { combine, timestamp, printf, colorize, json } = format;
 
-const usePretty = env.NODE_ENV !== 'production' && process.stdout.isTTY;
+const usePretty = !env.isProd && process.stdout.isTTY;
 
 const levels = {
   error: 0,
