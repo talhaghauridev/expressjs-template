@@ -7,6 +7,9 @@ import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
 import routes from '@/routes';
+import { db } from './database/db';
+import { users } from './database/schema';
+import ApiError from './utils/api-error';
 
 const app = express();
 
@@ -21,9 +24,29 @@ app.use(morganMiddleware);
 app.use('/api/v1', routes);
 
 app.get('/', async (req, res) => {
+  const _users = await db.query.users.findMany();
+  console.log(_users);
+
   return res.status(200).json({
     message: 'Server is running',
     success: true,
+    users: _users,
+  });
+});
+
+app.post('/create', async (req, res) => {
+  const { name, email, password, id } = req.body;
+  const user = await db.insert(users).values({
+    id,
+    email,
+    password,
+    name,
+  });
+  console.log(user);
+  return res.status(200).json({
+    message: 'Server is running',
+    success: true,
+    user: user,
   });
 });
 
