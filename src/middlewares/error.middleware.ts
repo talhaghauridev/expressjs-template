@@ -6,7 +6,9 @@ import handlePostgresError from '@/utils/handle-postgres-error';
 import logger from '@/utils/logger';
 
 const errorMiddleware = (err: any, req: Request, res: Response, next: NextFunction) => {
-  console.log(err);
+  if (env.isDev) {
+    logger.error(err);
+  }
   let error: ApiError;
 
   if (err.cause?.code && typeof err.cause.code === 'string') {
@@ -17,9 +19,6 @@ const errorMiddleware = (err: any, req: Request, res: Response, next: NextFuncti
     error = err;
   } else {
     error = ApiError.internal(err.message || ApiMessages.ERROR.INTERNAL_SERVER_ERROR);
-  }
-  if (env.isDev) {
-    logger.error(error.message);
   }
 
   res.status(error.statusCode).json({
