@@ -1,37 +1,31 @@
 import { NextFunction, Request, Response } from 'express';
-import { PostgresError } from 'postgres';
+import { ApiMessages } from '@/constants/api-messages';
 import { env } from '@/env';
 import ApiError from '@/utils/api-error';
 import handlePostgresError from '@/utils/handle-postgres-error';
 import logger from '@/utils/logger';
-import { ApiMessages } from '@/constants/api-messages';
 
-const errorMiddleware = (
-  err: Error | ApiError | PostgresError,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  let error = err;
+const errorMiddleware = (err: any, req: Request, res: Response, next: NextFunction) => {
+  console.log(err);
+  let error: ApiError;
 
-  if (env.NODE_ENV !== 'production') {
-    logger.error(err);
+  if (err.cause?.code && typeof err.cause.code === 'string') {
+    error = handlePostgresError(err.cause);
+  } else if (err.code && typeof err.code === 'string' && !err.statusCode) {
+    error = handlePostgresError(err);
+  } else if (err instanceof ApiError) {
+    error = err;
+  } else {
+    error = ApiError.internal(err.message || ApiMessages.ERROR.INTERNAL_SERVER_ERROR);
+  }
+  if (env.isDev) {
+    logger.error(error.message);
   }
 
-  if ('code' in err && typeof err.code === 'string') {
-    error = handlePostgresError(err as PostgresError);
-  }
-
-  if (!(error instanceof ApiError)) {
-    error = new ApiError(500, error.message || ApiMessages.ERROR.INTERNAL_SERVER_ERROR);
-  }
-
-  const apiError = error as ApiError;
-
-  res.status(apiError.statusCode).json({
+  res.status(error.statusCode).json({
     success: false,
-    statusCode: apiError.statusCode,
-    message: apiError.message,
+    statusCode: error.statusCode,
+    message: error.message,
     ...(env.NODE_ENV === 'development' && {
       stack: err.stack,
     }),
