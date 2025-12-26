@@ -1,5 +1,5 @@
 import { HTTP_STATUS } from './http-status';
-import { ResponseMessages } from '@/constants/response-messages';
+import { ApiMessages } from '@/constants/api-messages';
 import { Response } from 'express';
 
 class ApiResponse<T> {
@@ -11,7 +11,7 @@ class ApiResponse<T> {
   constructor(
     statusCode: number = HTTP_STATUS.OK,
     data: T,
-    message: string = ResponseMessages.SUCCESS.OPERATION_SUCCESS
+    message: string = ApiMessages.SUCCESS.SUCCESS
   ) {
     this.success = statusCode < 400;
     this.statusCode = statusCode;
@@ -19,12 +19,7 @@ class ApiResponse<T> {
     this.data = data;
   }
 
-  // Static methods for common success responses
-  static success<T>(
-    res: Response,
-    data: T,
-    message: string = ResponseMessages.SUCCESS.OPERATION_SUCCESS
-  ) {
+  static success<T>(res: Response, data: T, message: string = ApiMessages.SUCCESS.SUCCESS) {
     return res.status(HTTP_STATUS.OK).json({
       success: true,
       statusCode: HTTP_STATUS.OK,
@@ -33,11 +28,7 @@ class ApiResponse<T> {
     });
   }
 
-  static created<T>(
-    res: Response,
-    data: T,
-    message: string = ResponseMessages.SUCCESS.DATA_CREATED
-  ) {
+  static created<T>(res: Response, data: T, message: string = ApiMessages.SUCCESS.CREATED) {
     return res.status(HTTP_STATUS.CREATED).json({
       success: true,
       statusCode: HTTP_STATUS.CREATED,
@@ -46,11 +37,7 @@ class ApiResponse<T> {
     });
   }
 
-  static updated<T>(
-    res: Response,
-    data: T,
-    message: string = ResponseMessages.SUCCESS.DATA_UPDATED
-  ) {
+  static updated<T>(res: Response, data: T, message: string = ApiMessages.SUCCESS.UPDATED) {
     return res.status(HTTP_STATUS.OK).json({
       success: true,
       statusCode: HTTP_STATUS.OK,
@@ -59,7 +46,7 @@ class ApiResponse<T> {
     });
   }
 
-  static deleted(res: Response, message: string = ResponseMessages.SUCCESS.DATA_DELETED) {
+  static deleted(res: Response, message: string = ApiMessages.SUCCESS.DELETED) {
     return res.status(HTTP_STATUS.NO_CONTENT).json({
       success: true,
       statusCode: HTTP_STATUS.NO_CONTENT,

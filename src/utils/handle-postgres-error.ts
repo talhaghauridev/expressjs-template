@@ -1,6 +1,6 @@
+import { ApiMessages } from '@/constants/api-messages';
 import { PostgresError } from 'postgres';
 import ApiError from './api-error';
-
 const handlePostgresError = (error: PostgresError) => {
   switch (error.code) {
     case '23505': // Unique violation
@@ -15,7 +15,7 @@ const handlePostgresError = (error: PostgresError) => {
       return new ApiError(400, `${column} cannot be null`);
 
     default:
-      return new ApiError(500, 'Database error occurred');
+      return new ApiError(500, ApiMessages.ERROR.DATABASE_ERROR);
   }
 };
 export default handlePostgresError;

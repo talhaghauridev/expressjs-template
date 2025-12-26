@@ -5,8 +5,8 @@ import { HelmetOptions } from 'helmet';
 
 const getAllowedOrigins = (): string[] => {
   return env.CORS_ALLOWED_ORIGINS.split(',')
-    .map(origin => origin.trim())
-    .filter(origin => origin.length > 0);
+    .map((origin) => origin.trim())
+    .filter((origin) => origin.length > 0);
 };
 
 const cors: CorsOptions = {

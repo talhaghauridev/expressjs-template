@@ -4,6 +4,7 @@ import { env } from '@/env';
 import ApiError from '@/utils/api-error';
 import handlePostgresError from '@/utils/handle-postgres-error';
 import logger from '@/utils/logger';
+import { ApiMessages } from '@/constants/api-messages';
 
 const errorMiddleware = (
   err: Error | ApiError | PostgresError,
@@ -22,7 +23,7 @@ const errorMiddleware = (
   }
 
   if (!(error instanceof ApiError)) {
-    error = new ApiError(500, error.message || 'Internal Server Error');
+    error = new ApiError(500, error.message || ApiMessages.ERROR.INTERNAL_SERVER_ERROR);
   }
 
   const apiError = error as ApiError;
