@@ -31,10 +31,16 @@ const PlatformType = {
   MOBILE: 'mobile',
 } as const;
 
+const LocationType = {
+  REGISTRATION: 'registration',
+  LAST_LOGIN: 'last_login',
+} as const;
+
 const AvailableAuthProviders = Object.values(AuthProviderType);
 const AvailableVerifications = Object.values(VerificationType);
 const AvailablePlatforms = Object.values(PlatformType);
 const AvailableUserRoles = Object.values(UserRoles);
+const AvailableLocationTypes = Object.values(LocationType);
 
 export {
   CACHE_KEY_PREFIX,
@@ -47,4 +53,6 @@ export {
   PlatformType,
   UserRoles,
   AvailableUserRoles,
+  LocationType,
+  AvailableLocationTypes,
 };
