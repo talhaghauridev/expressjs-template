@@ -8,6 +8,20 @@
       "when": 1766835771916,
       "tag": "0000_lumpy_shadowcat",
       "breakpoints": false
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1766844492187,
+      "tag": "0001_lyrical_red_hulk",
+      "breakpoints": false
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1766849264211,
+      "tag": "0002_graceful_mariko_yashida",
+      "breakpoints": false
     }
   ]
 }

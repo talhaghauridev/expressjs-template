@@ -26,6 +26,7 @@ app.use(morganMiddleware);
 app.use('/api/v1', routes);
 
 import { UAParser } from 'ua-parser-js';
+import { UserRepository } from './repositories/users.repository';
 
 app.get('/', async (req, res) => {
   const clientIp = requestIp.getClientIp(req); // ✅ Simple!
@@ -59,6 +60,33 @@ app.get('/two', async (req, res) => {
     success: true,
     device,
     performanceMs: timeMs,
+  });
+});
+
+app.get('/users', async (req, res) => {
+  const users = await db.query.users.findMany({
+    columns: { password: false, email: false },
+  });
+  return res.status(200).json({
+    message: 'Server is running',
+    success: true,
+    users,
+  });
+});
+
+app.post('/users', async (req, res) => {
+  const user = await UserRepository.create(
+    {
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+    },
+    { password: false }
+  );
+  return res.status(200).json({
+    message: 'Server is running',
+    success: true,
+    user,
   });
 });
 

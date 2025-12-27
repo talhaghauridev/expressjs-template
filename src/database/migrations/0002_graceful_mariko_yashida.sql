@@ -1,0 +1,1 @@
+ALTER TABLE "verifications" ADD COLUMN "expires_at" timestamp NOT NULL;

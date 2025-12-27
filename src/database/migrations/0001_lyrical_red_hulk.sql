@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "token_idx" ON "verifications" USING btree ("token");

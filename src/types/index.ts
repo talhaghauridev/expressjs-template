@@ -11,4 +11,6 @@ type AuthRequestInfo = {
 
 type AsyncHandler = (req: Request, res: Response, next: NextFunction) => Promise<void | any>;
 
-export type { AsyncHandler, AuthRequestInfo };
+type SelectFields<T> = Partial<Record<keyof T, boolean>>;
+
+export type { AsyncHandler, AuthRequestInfo, SelectFields };
