@@ -1,0 +1,60 @@
+import { AvailablePlatforms, PlatformType, VerificationType } from '@/constants/auth';
+import { ExpiryTime } from '@/constants/expiry';
+import { env } from '@/env';
+import { VerificationRepository } from '@/repositories/verifications.repository';
+import { parseTimeToMs } from '@/utils/parse-time';
+import { sendEmail } from '@/utils/send-email';
+import crypto from 'crypto';
+
+export class VerificationService {
+  static async sendVerification(
+    userId: string,
+    email: string,
+    platform: (typeof AvailablePlatforms)[number]
+  ) {
+    if (platform === PlatformType.WEB) {
+      await this.sendVerificationLink(userId, email);
+    } else {
+      await this.sendVerificationOTP(userId, email);
+    }
+  }
+
+  private static async sendVerificationLink(userId: string, email: string) {
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + parseTimeToMs(ExpiryTime.EMAIL_VERIFICATION_LINK));
+
+    await VerificationRepository.createVerification(
+      userId,
+      VerificationType.EMAIL,
+      PlatformType.WEB,
+      token,
+      expiresAt
+    );
+
+    const verificationUrl = `${env.FRONTEND_URL}/verify-email?token=${token}`;
+    await sendEmail({
+      to: email,
+      subject: 'Verify Your Email Address',
+      text: `Click this link to verify your email: ${verificationUrl}`,
+    });
+  }
+
+  private static async sendVerificationOTP(userId: string, email: string) {
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + parseTimeToMs(ExpiryTime.EMAIL_VERIFICATION_OTP));
+
+    await VerificationRepository.createVerification(
+      userId,
+      VerificationType.EMAIL,
+      PlatformType.MOBILE,
+      otp,
+      expiresAt
+    );
+
+    await sendEmail({
+      to: email,
+      subject: 'Your Verification Code',
+      text: `Your verification code is: ${otp}`,
+    });
+  }
+}
