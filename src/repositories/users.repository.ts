@@ -6,8 +6,11 @@ import { eq } from 'drizzle-orm';
 
 export class UserRepository {
   static async create(data: InsertUser, select?: SelectFields<User>) {
-    const [user] = await db.insert(users).values(data).returning(buildReturning(users, select));
-    return user;
+    const [user] = await db
+      .insert(users)
+      .values(data)
+      .returning(buildReturning<User>(users, select));
+    return user as User;
   }
 
   static async findById(id: string, select?: SelectFields<User>) {
@@ -50,7 +53,7 @@ export class UserRepository {
       .set({ ...data, updatedAt: new Date() })
       .where(eq(users.id, id))
       .returning(buildReturning(users, select));
-    return updated;
+    return updated as User;
   }
 
   static async delete(id: string): Promise<void> {

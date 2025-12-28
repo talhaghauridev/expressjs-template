@@ -7,6 +7,13 @@ const envSchema = z.object({
   DATABASE_URL: z.string().nonempty(),
   LOG_LEVEL: z.enum(['error', 'warn', 'info', 'http', 'debug']).default('http'),
   CORS_ALLOWED_ORIGINS: z.string().default(' * '),
+  ACCESS_TOKEN_SECRET: z.string().nonempty(),
+  ACCESS_TOKEN_EXPIRE: z.string().default('10h'),
+  REFRESH_TOKEN_EXPIRE: z.string().default('30d'),
+  SMTP_SERVICE: z.string().nonempty().default('gmail'),
+  SMTP_PASSWORD: z.string().nonempty(),
+  SMTP_MAIL: z.string().nonempty(),
+  FRONTEND_URL: z.string().url().default('http://localhost:3000'),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);

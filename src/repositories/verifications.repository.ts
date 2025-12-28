@@ -11,7 +11,7 @@ export class VerificationRepository {
       .values(data)
       .returning(buildReturning(verifications, select));
 
-    return verification;
+    return verification as Verification;
   }
 
   static async createVerification(

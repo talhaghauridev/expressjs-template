@@ -1,10 +1,11 @@
+import { AvailablePlatforms, PlatformType } from '@/constants/auth';
 import { Request } from 'express';
 import { UAParser } from 'ua-parser-js';
 
 const parser = new UAParser();
 
 export interface DeviceInfo {
-  platform: 'web' | 'mobile';
+  platform: (typeof AvailablePlatforms)[number];
   device: string | null;
   browser: string | null;
 }
@@ -15,7 +16,7 @@ export const getDeviceInfo = (req: Request): DeviceInfo => {
 
   if (deviceLower === 'android' || deviceLower === 'ios') {
     return {
-      platform: 'mobile',
+      platform: PlatformType.MOBILE,
       device: deviceLower,
       browser: null,
     };
@@ -24,8 +25,20 @@ export const getDeviceInfo = (req: Request): DeviceInfo => {
   const ua = parser.setUA(req.headers['user-agent'] || '').getResult();
 
   return {
-    platform: 'web',
+    platform: PlatformType.WEB,
     device: ua.os.name?.toLowerCase() || null,
     browser: ua.browser.name || null,
   };
+};
+
+export const formatDeviceInfo = (deviceInfo: DeviceInfo): string | null => {
+  if (deviceInfo.platform === PlatformType.MOBILE) {
+    return deviceInfo.device;
+  }
+
+  if (!deviceInfo.browser || !deviceInfo.device) {
+    return null;
+  }
+
+  return `${deviceInfo.browser} on ${deviceInfo.device}`;
 };

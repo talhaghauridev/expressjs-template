@@ -27,12 +27,23 @@ app.use('/api/v1', routes);
 
 import { UAParser } from 'ua-parser-js';
 import { UserRepository } from './repositories/users.repository';
+import { z } from 'zod';
+import { ApiMessages } from './constants/api-messages';
+
+const sampleSchema = z.object({
+  name: z
+    .string()
+    .nonempty({ message: ApiMessages.VALIDATION.REQUIRED('Name'), abort: true })
+    .min(5, { message: ApiMessages.VALIDATION.MIN_LENGTH('Name', 5), abort: true })
+    .max(10, { message: ApiMessages.VALIDATION.MAX_LENGTH('Name', 10), abort: true }),
+  password: z.string().min(6).max(100),
+});
 
 app.get('/', async (req, res) => {
-  const clientIp = requestIp.getClientIp(req); // ✅ Simple!
+  const clientIp = requestIp.getClientIp(req);
   console.log('IPS:', { reqIp: req.ip, clientIp });
   const location = await getLocationFromIp(clientIp!);
-
+  console.log('Location:', location);
   const parser = new UAParser(req.headers['user-agent']);
   const result = parser.getResult();
 
@@ -64,13 +75,14 @@ app.get('/two', async (req, res) => {
 });
 
 app.get('/users', async (req, res) => {
-  const users = await db.query.users.findMany({
-    columns: { password: false, email: false },
-  });
+  const parse = sampleSchema.safeParse(req.body);
+
+  // logger.info('Check Validation:', parse.error?.issues.map((e)=>e.code==="invalid_type" ?{}));
+
   return res.status(200).json({
     message: 'Server is running',
     success: true,
-    users,
+    error: parse.error?.issues,
   });
 });
 

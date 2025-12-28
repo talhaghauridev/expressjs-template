@@ -22,6 +22,27 @@
       "when": 1766849264211,
       "tag": "0002_graceful_mariko_yashida",
       "breakpoints": false
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1766857773191,
+      "tag": "0003_watery_shiva",
+      "breakpoints": false
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1766857839165,
+      "tag": "0004_volatile_scrambler",
+      "breakpoints": false
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1766928392806,
+      "tag": "0005_damp_starjammers",
+      "breakpoints": false
     }
   ]
 }

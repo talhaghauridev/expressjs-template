@@ -49,7 +49,7 @@ export const getLocationFromIp = async (ip: string): Promise<LocationInfo> => {
       longitude: geo.ll?.[1] || null,
     };
   } catch (error) {
-    console.error('Geolocation failed:', error);
+    logger.error('Geolocation failed:', error);
     return {
       ip,
       country: null,

@@ -4,6 +4,7 @@ import { relations } from 'drizzle-orm';
 import { boolean, pgEnum, pgTable, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core';
 import { verifications } from './verifications';
 import { userLocations } from './user-locations';
+import { sessions } from './sessions';
 
 export const authProviderEnum = pgEnum(
   'auth_provider',
@@ -18,7 +19,7 @@ export const users = pgTable(
     id: uuid().defaultRandom().primaryKey(),
     name: varchar('name', { length: 100 }).notNull(),
     email: varchar('email', { length: 100 }).notNull(),
-    password: varchar('password', { length: 60 }),
+    password: varchar('password', { length: 60 }).notNull(),
     providerId: varchar('provider_id', { length: 255 }),
     provider: authProviderEnum('provider').default(AuthProviderType.CUSTOM).notNull(),
     role: userRoleEnum('role').default('user').notNull(),
@@ -35,6 +36,7 @@ export const users = pgTable(
 export const usersRelations = relations(users, ({ many }) => ({
   verifications: many(verifications),
   locations: many(userLocations),
+  sessions: many(sessions),
 }));
 
 export type User = typeof users.$inferSelect;

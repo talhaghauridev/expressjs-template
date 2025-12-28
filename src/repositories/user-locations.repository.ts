@@ -12,12 +12,13 @@ export class UserLocationRepository {
       .values(data)
       .returning(buildReturning(userLocations, select));
 
-    return location;
+    return location as UserLocation;
   }
 
   static async upsertLastLogin(
     userId: string,
-    locationData: Omit<InsertUserLocation, 'userId' | 'type'>
+    locationData: Omit<InsertUserLocation, 'userId' | 'type'>,
+    select?: SelectFields<UserLocation>
   ) {
     return await db.transaction(async (trx) => {
       const existing = await trx.query.userLocations.findFirst({
@@ -25,6 +26,10 @@ export class UserLocationRepository {
           eq(userLocations.userId, userId),
           eq(userLocations.type, LocationType.LAST_LOGIN)
         ),
+        columns: {
+          userId: true,
+          id: true,
+        },
       });
 
       if (existing) {
@@ -32,7 +37,7 @@ export class UserLocationRepository {
           .update(userLocations)
           .set({ ...locationData, updatedAt: new Date() })
           .where(eq(userLocations.id, existing.id))
-          .returning();
+          .returning(buildReturning(userLocations, select));
 
         return updated;
       } else {
@@ -43,7 +48,7 @@ export class UserLocationRepository {
             type: LocationType.LAST_LOGIN,
             ...locationData,
           })
-          .returning();
+          .returning(buildReturning(userLocations, select));
 
         return created;
       }
