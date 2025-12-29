@@ -14,6 +14,7 @@ const envSchema = z.object({
   SMTP_PASSWORD: z.string().nonempty(),
   SMTP_MAIL: z.string().nonempty(),
   FRONTEND_URL: z.string().url().default('http://localhost:3000'),
+  APP_NAME: z.string().default('Template'),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);

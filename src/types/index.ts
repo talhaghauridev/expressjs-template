@@ -1,16 +1,16 @@
+import { User } from '@/database/schema';
 import { NextFunction, Request, Response } from 'express';
 
-type AuthRequestInfo = {
-  userId: string;
-  email: string;
-  id: string;
-  username: string;
-  fullName: string;
-  provider: string;
-};
+declare global {
+  namespace Express {
+    interface Request {
+      user: Partial<Omit<User, 'password'>>;
+    }
+  }
+}
 
 type AsyncHandler = (req: Request, res: Response, next: NextFunction) => Promise<void | any>;
 
 type SelectFields<T> = Partial<Record<keyof T, boolean>>;
 
-export type { AsyncHandler, AuthRequestInfo, SelectFields };
+export type { AsyncHandler, SelectFields };

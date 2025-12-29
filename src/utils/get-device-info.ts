@@ -23,7 +23,7 @@ export const getDeviceInfo = (req: Request): DeviceInfo => {
   }
 
   const ua = parser.setUA(req.headers['user-agent'] || '').getResult();
-
+  console.log({ ua });
   return {
     platform: PlatformType.WEB,
     device: ua.os.name?.toLowerCase() || null,

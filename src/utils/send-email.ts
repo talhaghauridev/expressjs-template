@@ -1,6 +1,6 @@
-import nodemailer, { SendMailOptions } from 'nodemailer';
 import { env } from '@/env';
 import ApiError from '@/utils/api-error';
+import nodemailer, { SendMailOptions } from 'nodemailer';
 import logger from './logger';
 
 export async function sendEmail(options: SendMailOptions): Promise<any> {
@@ -17,7 +17,7 @@ export async function sendEmail(options: SendMailOptions): Promise<any> {
     await transporter.verify();
 
     const mailOption: SendMailOptions = {
-      from: env.SMTP_MAIL,
+      from: `${env.APP_NAME} <${env.SMTP_MAIL}>`,
       ...options,
     };
 

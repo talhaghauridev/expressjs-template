@@ -95,6 +95,9 @@ export class VerificationRepository {
   static async deleteByUserId(userId: string): Promise<void> {
     await db.delete(verifications).where(eq(verifications.userId, userId));
   }
+  static async deleteAllByUserId(userId: string) {
+    await db.delete(verifications).where(eq(verifications.userId, userId));
+  }
 
   static async deleteByUserAndType(userId: string, type: string): Promise<void> {
     await db

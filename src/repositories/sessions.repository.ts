@@ -33,6 +33,20 @@ export class SessionRepository {
     await db.delete(sessions).where(eq(sessions.refreshToken, refreshToken));
   }
 
+  static async update(
+    sessionId: string,
+    data: Partial<typeof sessions.$inferInsert>,
+    select?: SelectFields<Session>
+  ) {
+    const [updated] = await db
+      .update(sessions)
+      .set(data)
+      .where(eq(sessions.id, sessionId))
+      .returning(buildReturning(sessions, select));
+
+    return updated as Session;
+  }
+
   static async deleteByUserId(userId: string): Promise<void> {
     await db.delete(sessions).where(eq(sessions.userId, userId));
   }
@@ -46,6 +60,14 @@ export class SessionRepository {
       .where(
         and(eq(sessions.userId, userId), sql`${sessions.refreshToken} != ${currentRefreshToken}`)
       );
+  }
+
+  static async deleteById(sessionId: string) {
+    await db.delete(sessions).where(eq(sessions.id, sessionId));
+  }
+
+  static async deleteAllByUserId(userId: string) {
+    await db.delete(sessions).where(eq(sessions.userId, userId));
   }
 
   static async deleteExpired(): Promise<void> {
