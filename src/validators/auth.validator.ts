@@ -58,7 +58,7 @@ export const resendVerificationSchema = createSchema({
 export const refreshTokenSchema = createSchema({
   body: {
     refreshToken: z
-      .string({ error: ApiMessages.VALIDATION.REQUIRED('Refresh token') })
+      .string({ error: ApiMessages.VALIDATION.REQUIRED('Refresh-token') })
       .trim()
       .min(1, ApiMessages.VALIDATION.REQUIRED('Refresh token')),
   },
@@ -67,7 +67,7 @@ export const refreshTokenSchema = createSchema({
 export const logoutSchema = createSchema({
   body: {
     refreshToken: z
-      .string({ error: ApiMessages.VALIDATION.REQUIRED('Refresh token') })
+      .string({ error: ApiMessages.VALIDATION.REQUIRED('Refresh-token') })
       .trim()
       .min(1, ApiMessages.VALIDATION.REQUIRED('Refresh token')),
   },
@@ -130,9 +130,9 @@ export const resetPasswordOTPSchema = createSchema({
   body: z
     .strictObject({
       resetToken: z
-        .string({ error: ApiMessages.VALIDATION.MUST_BE_STRING('Reset-Token') })
+        .string({ error: ApiMessages.VALIDATION.MUST_BE_STRING('ResetToken') })
         .trim()
-        .min(1, { error: ApiMessages.VALIDATION.REQUIRED('Reset-Token') }),
+        .min(1, { error: ApiMessages.VALIDATION.REQUIRED('ResetToken') }),
       password: z
         .string({ error: ApiMessages.VALIDATION.REQUIRED('Password') })
         .trim()
@@ -151,4 +151,10 @@ export const resetPasswordOTPSchema = createSchema({
       message: "Passwords don't match",
       path: ['confirmPassword'],
     }),
+});
+
+export const resendResetPasswordSchema = createSchema({
+  body: {
+    email: z.email({ error: ApiMessages.VALIDATION.INVALID_EMAIL }),
+  },
 });

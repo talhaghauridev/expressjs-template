@@ -78,6 +78,40 @@ export const resendVerification = asyncHandler(async (req: Request, res: Respons
   return ApiResponse.success(res, {}, message);
 });
 
+export const forgotPassword = asyncHandler(async (req: Request, res: Response) => {
+  const { email } = req.body;
+  const deviceInfo = getDeviceInfo(req);
+
+  const { message } = await AuthService.forgotPassword(email, deviceInfo.platform);
+
+  return ApiResponse.success(res, {}, message);
+});
+
+export const verifyResetPasswordOTP = asyncHandler(async (req: Request, res: Response) => {
+  const { email, otp } = req.body;
+  const { resetToken, message } = await AuthService.verifyResetPasswordOTP(email, otp);
+  return ApiResponse.success(res, { resetToken }, message);
+});
+
+export const resetPassword = asyncHandler(async (req: Request, res: Response) => {
+  const { token, password } = req.body;
+  const { message } = await AuthService.resetPassword(token, password);
+  return ApiResponse.success(res, {}, message);
+});
+
+export const resetPasswordOTP = asyncHandler(async (req: Request, res: Response) => {
+  const { resetToken, password } = req.body;
+  const { message } = await AuthService.resetPasswordOTP(resetToken, password);
+  return ApiResponse.success(res, {}, message);
+});
+
+export const resendResetPassword = asyncHandler(async (req: Request, res: Response) => {
+  const { email } = req.body;
+  const deviceInfo = getDeviceInfo(req);
+  const { message } = await AuthService.resendResetPassword(email, deviceInfo.platform);
+  return ApiResponse.success(res, {}, message);
+});
+
 export const refresh = asyncHandler(async (req: Request, res: Response) => {
   const { refreshToken } = req.body;
 
@@ -238,30 +272,3 @@ export const facebookCallback = asyncHandler(
     })(req, res, next);
   }
 );
-
-export const forgotPassword = asyncHandler(async (req: Request, res: Response) => {
-  const { email } = req.body;
-  const deviceInfo = getDeviceInfo(req);
-
-  const { message } = await AuthService.forgotPassword(email, deviceInfo.platform);
-
-  return ApiResponse.success(res, {}, message);
-});
-
-export const verifyResetPasswordOTP = asyncHandler(async (req: Request, res: Response) => {
-  const { email, otp } = req.body;
-  const { resetToken, message } = await AuthService.verifyResetPasswordOTP(email, otp);
-  return ApiResponse.success(res, { resetToken }, message);
-});
-
-export const resetPassword = asyncHandler(async (req: Request, res: Response) => {
-  const { token, password } = req.body;
-  const { message } = await AuthService.resetPassword(token, password);
-  return ApiResponse.success(res, {}, message);
-});
-
-export const resetPasswordOTP = asyncHandler(async (req: Request, res: Response) => {
-  const { resetToken, password } = req.body;
-  const { message } = await AuthService.resetPasswordOTP(resetToken, password);
-  return ApiResponse.success(res, {}, message);
-});

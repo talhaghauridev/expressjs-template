@@ -1,21 +1,22 @@
-import { Router } from 'express';
 import * as authController from '@/controllers/auth.controller';
+import { authenticate } from '@/middlewares/auth.middleware';
 import { validate } from '@/middlewares/validate.middleware';
 import {
-  registerSchema,
+  forgotPasswordSchema,
   loginSchema,
-  verifyEmailSchema,
-  verifyEmailOTPSchema,
-  resendVerificationSchema,
-  refreshTokenSchema,
   logoutSchema,
   oauthSchema,
-  forgotPasswordSchema,
-  resetPasswordSchema,
-  verifyResetPasswordOTPSchema,
+  refreshTokenSchema,
+  registerSchema,
+  resendResetPasswordSchema,
+  resendVerificationSchema,
   resetPasswordOTPSchema,
+  resetPasswordSchema,
+  verifyEmailOTPSchema,
+  verifyEmailSchema,
+  verifyResetPasswordOTPSchema,
 } from '@/validators/auth.validator';
-import { authenticate } from '@/middlewares/auth.middleware';
+import { Router } from 'express';
 
 const router = Router();
 
@@ -28,6 +29,7 @@ router.post(
   validate(resendVerificationSchema),
   authController.verifyEmailOTP
 );
+router.post('/forgot-password', validate(forgotPasswordSchema), authController.forgotPassword);
 
 router.post(
   '/verify-reset-otp',
@@ -39,6 +41,11 @@ router.post(
   '/reset-password-otp',
   validate(resetPasswordOTPSchema),
   authController.resetPasswordOTP
+);
+router.post(
+  '/resend-reset-password',
+  validate(resendResetPasswordSchema),
+  authController.resendResetPassword
 );
 
 router.post('/refresh-token', validate(refreshTokenSchema), authController.refresh);
