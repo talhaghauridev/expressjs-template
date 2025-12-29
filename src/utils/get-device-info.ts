@@ -1,6 +1,7 @@
 import { AvailablePlatforms, PlatformType } from '@/constants/auth';
 import { Request } from 'express';
 import { UAParser } from 'ua-parser-js';
+import logger from './logger';
 
 const parser = new UAParser();
 
@@ -23,7 +24,13 @@ export const getDeviceInfo = (req: Request): DeviceInfo => {
   }
 
   const ua = parser.setUA(req.headers['user-agent'] || '').getResult();
-  console.log({ ua });
+
+  logger.info('Device', {
+    platform: PlatformType.WEB,
+    device: ua.os.name?.toLowerCase() || null,
+    browser: ua.browser.name || null,
+  });
+
   return {
     platform: PlatformType.WEB,
     device: ua.os.name?.toLowerCase() || null,

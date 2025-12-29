@@ -7,4 +7,5 @@ export const ExpiryTime = {
   EMAIL_VERIFICATION_OTP: '15m',
   PASSWORD_RESET_LINK: '1h',
   PASSWORD_RESET_OTP: '10m',
+  PASSWORD_RESET_TOKEN: '15m',
 } as const;

@@ -9,6 +9,11 @@ import {
   resendVerificationSchema,
   refreshTokenSchema,
   logoutSchema,
+  oauthSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  verifyResetPasswordOTPSchema,
+  resetPasswordOTPSchema,
 } from '@/validators/auth.validator';
 import { authenticate } from '@/middlewares/auth.middleware';
 
@@ -23,8 +28,29 @@ router.post(
   validate(resendVerificationSchema),
   authController.verifyEmailOTP
 );
+
+router.post(
+  '/verify-reset-otp',
+  validate(verifyResetPasswordOTPSchema),
+  authController.verifyResetPasswordOTP
+);
+router.post('/reset-password', validate(resetPasswordSchema), authController.resetPassword);
+router.post(
+  '/reset-password-otp',
+  validate(resetPasswordOTPSchema),
+  authController.resetPasswordOTP
+);
+
 router.post('/refresh-token', validate(refreshTokenSchema), authController.refresh);
 router.post('/logout', authenticate, validate(logoutSchema), authController.logout);
 router.post('/logout-all', authenticate, authController.logoutAll);
+
+router.get('/google/url', validate(oauthSchema), authController.googleAuthUrl);
+router.get('/google', validate(oauthSchema), authController.googleAuth);
+router.get('/google/callback', authController.googleCallback);
+
+router.get('/facebook/url', validate(oauthSchema), authController.facebookAuthUrl);
+router.get('/facebook', validate(oauthSchema), authController.facebookAuth);
+router.get('/facebook/callback', authController.facebookCallback);
 
 export default router;

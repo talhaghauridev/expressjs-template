@@ -1,4 +1,11 @@
-import { AuthProviderType, AvailablePlatforms, LocationType, PlatformType } from '@/constants/auth';
+import {
+  AuthProviderType,
+  AvailableAuthProviders,
+  AvailablePlatforms,
+  LocationType,
+  PlatformType,
+  VerificationType,
+} from '@/constants/auth';
 import { ExpiryTime } from '@/constants/expiry';
 import { SessionRepository } from '@/repositories/sessions.repository';
 import { UserLocationRepository } from '@/repositories/user-locations.repository';
@@ -342,7 +349,266 @@ export class AuthService {
     return { message: 'Logged out from all devices' };
   }
 
-  public static excludePassword<T extends { password?: string }>(
+  static async forgotPassword(email: string, platform: (typeof AvailablePlatforms)[number]) {
+    const user = await UserRepository.findByEmail(email, {
+      id: true,
+      isVerified: true,
+      provider: true,
+    });
+
+    if (!user || !user.isVerified || user.provider !== AuthProviderType.CUSTOM) {
+      throw ApiError.badRequest('Email does not exist');
+    }
+
+    await VerificationService.sendPasswordReset(user.id, email, platform);
+
+    return {
+      message:
+        platform === PlatformType.WEB
+          ? 'Password reset link sent to your email'
+          : 'Password reset code sent to your email',
+    };
+  }
+
+  static async verifyResetPasswordOTP(email: string, otp: string) {
+    const verification = await VerificationRepository.findByToken(otp, {
+      userId: true,
+      expiresAt: true,
+      type: true,
+      platform: true,
+    });
+
+    if (!verification) {
+      throw ApiError.badRequest('Invalid reset code');
+    }
+
+    const user = await UserRepository.findById(verification.userId, { email: true });
+
+    if (!user || user.email !== email) {
+      throw ApiError.badRequest('Invalid reset code');
+    }
+
+    if (verification.expiresAt < new Date()) {
+      await VerificationRepository.deleteByToken(otp);
+      throw ApiError.badRequest('This reset code has expired. Please request a new one');
+    }
+
+    if (verification.type !== VerificationType.PASSWORD_RESET) {
+      throw ApiError.badRequest('Invalid code type');
+    }
+
+    if (verification.platform !== PlatformType.MOBILE) {
+      throw ApiError.badRequest('Please use the reset code sent to your email');
+    }
+
+    const resetToken = TokenService.generatePasswordResetToken(verification.userId);
+
+    await VerificationRepository.deleteByToken(otp);
+
+    return {
+      resetToken,
+      message: 'Reset code verified successfully',
+    };
+  }
+
+  static async resetPassword(token: string, password: string) {
+    const verification = await VerificationRepository.findByToken(token, {
+      userId: true,
+      expiresAt: true,
+      type: true,
+      platform: true,
+    });
+
+    if (!verification) {
+      throw ApiError.badRequest('This password reset link is invalid or has already been used');
+    }
+
+    if (verification.expiresAt < new Date()) {
+      await VerificationRepository.deleteByToken(token);
+      throw ApiError.badRequest('This password reset link has expired. Please request a new one');
+    }
+
+    if (verification.type !== VerificationType.PASSWORD_RESET) {
+      throw ApiError.badRequest('Invalid token type');
+    }
+
+    if (verification.platform !== PlatformType.WEB) {
+      throw ApiError.badRequest('Please use the password reset link sent to your email');
+    }
+
+    const hashedPassword = await hashPassword(password);
+
+    await UserRepository.update(verification.userId, { password: hashedPassword }, { id: true });
+    await VerificationRepository.deleteByToken(token);
+
+    return { message: 'Password reset successfully' };
+  }
+
+  static async resetPasswordOTP(resetToken: string, password: string) {
+    const decoded = TokenService.verifyPasswordResetToken(resetToken);
+
+    if (!decoded) {
+      throw ApiError.badRequest('Invalid or expired reset token');
+    }
+
+    const hashedPassword = await hashPassword(password);
+
+    await UserRepository.update(decoded.userId, { password: hashedPassword }, { id: true });
+
+    return { message: 'Password reset successfully' };
+  }
+
+  static async handleOAuthLogin(
+    profile: any,
+    provider: (typeof AvailableAuthProviders)[number],
+    deviceInfo: DeviceInfo,
+    clientIp: string
+  ) {
+    const normalized = this.normalizeOAuthProfile(profile, provider);
+
+    if (!normalized.email) {
+      throw ApiError.badRequest('Email not provided by OAuth provider');
+    }
+
+    const existingUser = await UserRepository.findByEmail(normalized.email, {
+      password: false,
+    });
+
+    if (existingUser) {
+      if (existingUser.provider !== provider) {
+        const providerName = this.getProviderDisplayName(existingUser.provider);
+        throw ApiError.conflict(
+          `You have previously registered using ${providerName}. Please use the ${providerName} login option.`
+        );
+      }
+
+      const { accessToken, refreshToken } = TokenService.generateAccessAndRefreshToken({
+        id: existingUser.id,
+        name: existingUser.name,
+        email: existingUser.email,
+        role: existingUser.role,
+        provider: existingUser.provider,
+      });
+
+      await SessionRepository.create(
+        {
+          userId: existingUser.id,
+          refreshToken,
+          deviceInfo: formatDeviceInfo(deviceInfo),
+          expiresAt: new Date(Date.now() + parseTimeToMs(ExpiryTime.REFRESH_TOKEN)),
+        },
+        { refreshToken: true }
+      );
+
+      const location = await getLocationFromIp(clientIp);
+
+      await UserLocationRepository.upsertLastLogin(
+        existingUser.id,
+        {
+          country: location.country,
+          city: location.city,
+          ip: clientIp,
+          platform: deviceInfo.platform,
+          device: deviceInfo.device,
+          browser: deviceInfo.browser,
+        },
+        { id: true }
+      );
+
+      return {
+        accessToken,
+        refreshToken,
+        user: existingUser,
+      };
+    }
+
+    const user = await UserRepository.create(
+      {
+        email: normalized.email,
+        name: normalized.name,
+        image: normalized.image,
+        password: null,
+        provider,
+        providerId: normalized.providerId,
+        isVerified: true,
+      },
+      { password: false }
+    );
+
+    const location = await getLocationFromIp(clientIp);
+
+    await UserLocationRepository.create(
+      {
+        userId: user.id,
+        type: LocationType.REGISTRATION,
+        country: location.country,
+        city: location.city,
+        ip: clientIp,
+        platform: deviceInfo.platform,
+        device: deviceInfo.device,
+        browser: deviceInfo.browser,
+      },
+      { id: true }
+    );
+
+    const { accessToken, refreshToken } = TokenService.generateAccessAndRefreshToken({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      provider: user.provider,
+    });
+
+    await SessionRepository.create(
+      {
+        userId: user.id,
+        refreshToken,
+        deviceInfo: formatDeviceInfo(deviceInfo),
+        expiresAt: new Date(Date.now() + parseTimeToMs(ExpiryTime.REFRESH_TOKEN)),
+      },
+      { refreshToken: true }
+    );
+    return {
+      accessToken,
+      refreshToken,
+      user,
+    };
+  }
+
+  private static getProviderDisplayName(provider: string): string {
+    if (provider === 'custom') {
+      return 'Email/Password';
+    }
+    return provider.charAt(0).toUpperCase() + provider.slice(1);
+  }
+
+  private static normalizeOAuthProfile(
+    profile: any,
+    provider: (typeof AvailableAuthProviders)[number]
+  ) {
+    switch (provider) {
+      case AuthProviderType.GOOGLE:
+        return {
+          providerId: profile.id,
+          email: profile.emails?.[0]?.value || '',
+          name: profile.displayName || '',
+          image: profile.photos?.[0]?.value || null,
+        };
+
+      case AuthProviderType.FACEBOOK:
+        return {
+          providerId: profile.id,
+          email: profile.emails?.[0]?.value || profile._json?.email || '',
+          name: profile.displayName || profile._json?.name || '',
+          image: profile.photos?.[0]?.value || profile._json?.picture?.data?.url || null,
+        };
+
+      default:
+        throw ApiError.badRequest(`Unsupported provider: ${provider}`);
+    }
+  }
+
+  public static excludePassword<T extends { password?: string | null }>(
     user: T | null
   ): Omit<T, 'password'> | null {
     if (!user) return null;

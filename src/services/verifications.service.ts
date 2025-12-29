@@ -57,4 +57,41 @@ export class VerificationService {
       text: `Your verification code is: ${otp}`,
     });
   }
+
+  static async sendPasswordReset(
+    userId: string,
+    email: string,
+    platform: (typeof AvailablePlatforms)[number]
+  ) {
+    let token: string;
+    let expiresAt: Date;
+    let subject: string;
+    let message: string;
+
+    if (platform === PlatformType.WEB) {
+      token = crypto.randomBytes(32).toString('hex');
+      expiresAt = new Date(Date.now() + parseTimeToMs(ExpiryTime.EMAIL_VERIFICATION_LINK));
+      subject = 'Reset Your Password';
+      message = `Click this link to reset your password: ${env.FRONTEND_URL}/reset-password?token=${token}`;
+    } else {
+      token = Math.floor(100000 + Math.random() * 900000).toString();
+      expiresAt = new Date(Date.now() + parseTimeToMs(ExpiryTime.EMAIL_VERIFICATION_OTP));
+      subject = 'Your Password Reset Code';
+      message = `Your password reset code is: ${token}`;
+    }
+
+    await VerificationRepository.createVerification(
+      userId,
+      VerificationType.PASSWORD_RESET,
+      platform,
+      token,
+      expiresAt
+    );
+
+    await sendEmail({
+      to: email,
+      subject,
+      text: message,
+    });
+  }
 }

@@ -1,3 +1,4 @@
+import { VerificationType } from '@/constants/auth';
 import { ExpiryTime } from '@/constants/expiry';
 import { User } from '@/database/schema';
 import { env } from '@/env';
@@ -27,6 +28,31 @@ export class TokenService {
     try {
       return jwt.verify(token, env.ACCESS_TOKEN_SECRET) as TokenPayload;
     } catch {
+      return null;
+    }
+  }
+
+  static generatePasswordResetToken(userId: string): string {
+    const payload = {
+      userId,
+      type: VerificationType.PASSWORD_RESET,
+    };
+
+    return jwt.sign(payload, env.ACCESS_TOKEN_SECRET, {
+      expiresIn: ExpiryTime.PASSWORD_RESET_TOKEN,
+    });
+  }
+
+  static verifyPasswordResetToken(token: string): { userId: string } | null {
+    try {
+      const decoded = jwt.verify(token, env.ACCESS_TOKEN_SECRET) as any;
+
+      if (decoded.type !== VerificationType.PASSWORD_RESET) {
+        return null;
+      }
+
+      return { userId: decoded.userId };
+    } catch (error) {
       return null;
     }
   }

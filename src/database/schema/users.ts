@@ -1,10 +1,10 @@
 import { AuthProviderType, AvailableAuthProviders, AvailableUserRoles } from '@/constants/auth';
 import { timestamps } from '@/utils/timestamps-helper';
 import { relations } from 'drizzle-orm';
-import { boolean, pgEnum, pgTable, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core';
-import { verifications } from './verifications';
-import { userLocations } from './user-locations';
+import { boolean, pgEnum, pgTable, text, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core';
 import { sessions } from './sessions';
+import { userLocations } from './user-locations';
+import { verifications } from './verifications';
 
 export const authProviderEnum = pgEnum(
   'auth_provider',
@@ -19,12 +19,12 @@ export const users = pgTable(
     id: uuid().defaultRandom().primaryKey(),
     name: varchar('name', { length: 100 }).notNull(),
     email: varchar('email', { length: 100 }).notNull(),
-    password: varchar('password', { length: 60 }).notNull(),
+    password: varchar('password', { length: 60 }),
+    image: text('image'),
     providerId: varchar('provider_id', { length: 255 }),
     provider: authProviderEnum('provider').default(AuthProviderType.CUSTOM).notNull(),
     role: userRoleEnum('role').default('user').notNull(),
     isVerified: boolean('is_verified').default(false).notNull(),
-    profileCompleted: boolean('profile_completed').default(false).notNull(),
     ...timestamps,
   },
   (table) => [
