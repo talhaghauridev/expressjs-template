@@ -1,9 +1,8 @@
-import { pgTable, uuid, varchar, pgEnum, timestamp, index } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
-import { users } from './users';
-import { platformEnum } from './verifications';
 import { AvailableLocationTypes } from '@/constants/auth';
 import { timestamps } from '@/utils/timestamps-helper';
+import { index, pgEnum, pgTable, uuid, varchar } from 'drizzle-orm/pg-core';
+import { users } from './users';
+import { platformEnum } from './verifications';
 
 export const locationTypeEnum = pgEnum(
   'location_type',
@@ -31,13 +30,6 @@ export const userLocations = pgTable(
   },
   (t) => [index('user_id_type_idx').on(t.userId, t.type)]
 );
-
-export const userLocationsRelations = relations(userLocations, ({ one }) => ({
-  user: one(users, {
-    fields: [userLocations.userId],
-    references: [users.id],
-  }),
-}));
 
 export type UserLocation = typeof userLocations.$inferSelect;
 export type InsertUserLocation = typeof userLocations.$inferInsert;

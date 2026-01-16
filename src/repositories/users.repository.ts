@@ -15,21 +15,21 @@ export class UserRepository {
 
   static async findById(id: string, select?: SelectFields<User>) {
     return await db.query.users.findFirst({
-      where: eq(users.id, id),
+      where: { id },
       columns: normalizeSelect(select),
     });
   }
 
   static async findByEmail(email: string, select?: SelectFields<User>) {
     return await db.query.users.findFirst({
-      where: eq(users.email, email),
+      where: { email },
       columns: normalizeSelect(select),
     });
   }
 
   static async findByIdWithLocations(id: string, select?: SelectFields<User>) {
     return await db.query.users.findFirst({
-      where: eq(users.id, id),
+      where: { id },
       columns: normalizeSelect(select),
       with: {
         locations: true,
@@ -39,7 +39,7 @@ export class UserRepository {
 
   static async findByEmailWithLocations(email: string, select?: SelectFields<User>) {
     return await db.query.users.findFirst({
-      where: eq(users.email, email),
+      where: { email },
       columns: normalizeSelect(select),
       with: {
         locations: true,

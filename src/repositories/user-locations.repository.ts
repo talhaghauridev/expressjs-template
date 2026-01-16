@@ -3,7 +3,7 @@ import { db } from '@/database/db';
 import { userLocations, type InsertUserLocation, type UserLocation } from '@/database/schema';
 import { SelectFields } from '@/types';
 import { buildReturning, normalizeSelect } from '@/utils/repository-helpers';
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
 export class UserLocationRepository {
   static async create(data: InsertUserLocation, select?: SelectFields<UserLocation>) {
@@ -22,10 +22,10 @@ export class UserLocationRepository {
   ) {
     return await db.transaction(async (trx) => {
       const existing = await trx.query.userLocations.findFirst({
-        where: and(
-          eq(userLocations.userId, userId),
-          eq(userLocations.type, LocationType.LAST_LOGIN)
-        ),
+        where: {
+          userId,
+          type: LocationType.LAST_LOGIN,
+        },
         columns: {
           userId: true,
           id: true,
@@ -35,29 +35,32 @@ export class UserLocationRepository {
       if (existing) {
         const [updated] = await trx
           .update(userLocations)
-          .set({ ...locationData, updatedAt: new Date() })
+          .set({
+            ...locationData,
+            updatedAt: new Date(),
+          })
           .where(eq(userLocations.id, existing.id))
           .returning(buildReturning(userLocations, select));
 
         return updated;
-      } else {
-        const [created] = await trx
-          .insert(userLocations)
-          .values({
-            userId,
-            type: LocationType.LAST_LOGIN,
-            ...locationData,
-          })
-          .returning(buildReturning(userLocations, select));
-
-        return created;
       }
+
+      const [created] = await trx
+        .insert(userLocations)
+        .values({
+          userId,
+          type: LocationType.LAST_LOGIN,
+          ...locationData,
+        })
+        .returning(buildReturning(userLocations, select));
+
+      return created;
     });
   }
 
   static async findByUserId(userId: string, select?: SelectFields<UserLocation>) {
     return await db.query.userLocations.findMany({
-      where: eq(userLocations.userId, userId),
+      where: { userId },
       columns: normalizeSelect(select),
     });
   }
@@ -68,7 +71,10 @@ export class UserLocationRepository {
     select?: SelectFields<UserLocation>
   ) {
     return await db.query.userLocations.findFirst({
-      where: and(eq(userLocations.userId, userId), eq(userLocations.type, type)),
+      where: {
+        userId,
+        type,
+      },
       columns: normalizeSelect(select),
     });
   }

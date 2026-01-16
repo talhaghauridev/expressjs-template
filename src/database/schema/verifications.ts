@@ -1,7 +1,6 @@
 import { AvailablePlatforms, AvailableVerifications } from '@/constants/auth';
 import { timestamps } from '@/utils/timestamps-helper';
-import { relations } from 'drizzle-orm';
-import { index, pgEnum, pgTable, uuid, varchar, uniqueIndex, timestamp } from 'drizzle-orm/pg-core';
+import { index, pgEnum, pgTable, timestamp, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core';
 import { users } from './users';
 
 export const verificationTypeEnum = pgEnum(
@@ -29,13 +28,6 @@ export const verifications = pgTable(
     uniqueIndex('token_idx').on(t.token),
   ]
 );
-
-export const verificationsRelations = relations(verifications, ({ one }) => ({
-  user: one(users, {
-    fields: [verifications.userId],
-    references: [users.id],
-  }),
-}));
 
 export type Verification = typeof verifications.$inferSelect;
 export type InsertVerification = typeof verifications.$inferInsert;

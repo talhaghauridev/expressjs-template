@@ -16,16 +16,16 @@ export class SessionRepository {
 
   static async findByRefreshToken(refreshToken: string, select?: SelectFields<Session>) {
     return await db.query.sessions.findFirst({
-      where: eq(sessions.refreshToken, refreshToken),
+      where: { refreshToken },
       columns: normalizeSelect(select),
     });
   }
 
   static async findByUserId(userId: string, select?: SelectFields<Session>) {
     return await db.query.sessions.findMany({
-      where: eq(sessions.userId, userId),
+      where: { userId },
       columns: normalizeSelect(select),
-      orderBy: (sessions, { desc }) => [desc(sessions.createdAt)],
+      orderBy: { createdAt: 'desc' },
     });
   }
 

@@ -1,6 +1,6 @@
 import { AuthProviderType, AvailableAuthProviders, AvailableUserRoles } from '@/constants/auth';
 import { timestamps } from '@/utils/timestamps-helper';
-import { relations, sql } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import {
   boolean,
   check,
@@ -11,9 +11,6 @@ import {
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core';
-import { sessions } from './sessions';
-import { userLocations } from './user-locations';
-import { verifications } from './verifications';
 
 export const authProviderEnum = pgEnum(
   'auth_provider',
@@ -41,16 +38,10 @@ export const users = pgTable(
     uniqueIndex('provider_user_idx').on(table.provider, table.providerId),
     check(
       'custom_auth_password_check',
-      sql`${table.provider} != 'custom' OR ${table.password} IS NOT NULL`
+      sql`${table.provider} != ${AuthProviderType.CUSTOM} OR ${table.password} IS NOT NULL`
     ),
   ]
 );
-
-export const usersRelations = relations(users, ({ many }) => ({
-  verifications: many(verifications),
-  locations: many(userLocations),
-  sessions: many(sessions),
-}));
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;

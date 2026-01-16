@@ -49,14 +49,14 @@ export class VerificationRepository {
 
   static async findByToken(token: string, select?: SelectFields<Verification>) {
     return await db.query.verifications.findFirst({
-      where: eq(verifications.token, token),
+      where: { token },
       columns: normalizeSelect(select),
     });
   }
 
   static async findByUserId(userId: string, select?: SelectFields<Verification>) {
     return await db.query.verifications.findMany({
-      where: eq(verifications.userId, userId),
+      where: { userId },
       columns: normalizeSelect(select),
     });
   }
@@ -67,7 +67,10 @@ export class VerificationRepository {
     select?: SelectFields<Verification>
   ) {
     return await db.query.verifications.findFirst({
-      where: and(eq(verifications.userId, userId), eq(verifications.type, type)),
+      where: {
+        userId,
+        type,
+      },
       columns: normalizeSelect(select),
     });
   }
@@ -79,11 +82,11 @@ export class VerificationRepository {
     select?: SelectFields<Verification>
   ) {
     return await db.query.verifications.findFirst({
-      where: and(
-        eq(verifications.userId, userId),
-        eq(verifications.type, type),
-        eq(verifications.platform, platform)
-      ),
+      where: {
+        userId,
+        type,
+        platform,
+      },
       columns: normalizeSelect(select),
     });
   }
