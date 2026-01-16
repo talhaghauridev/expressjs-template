@@ -1,4 +1,3 @@
-import ms from 'ms';
 import app from './app';
 import { env } from './env';
 import logger from './utils/logger';

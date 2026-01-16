@@ -10,6 +10,7 @@ const envSchema = z.object({
   CORS_ALLOWED_ORIGINS: z.string().default(' * '),
   ACCESS_TOKEN_SECRET: z.string().nonempty(),
   ACCESS_TOKEN_EXPIRE: z.string().default('10h'),
+  REFRESH_TOKEN_SECRET: z.string().nonempty(),
   REFRESH_TOKEN_EXPIRE: z.string().default('30d'),
   FRONTEND_URL: z.url().default('http://localhost:3000'),
   BACKEND_URL: z.url().default('http://localhost:4000'),

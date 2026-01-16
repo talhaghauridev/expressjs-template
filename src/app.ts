@@ -13,7 +13,7 @@ import requestIp from 'request-ip';
 
 const app = express();
 app.set('trust proxy', true);
-app.use(helmet(config.helemt));
+app.use(helmet(config.helmet));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());

@@ -27,7 +27,7 @@ router.post('/verify-otp', validate(verifyEmailOTPSchema), authController.verify
 router.post(
   '/resend-verification',
   validate(resendVerificationSchema),
-  authController.verifyEmailOTP
+  authController.resendVerification
 );
 router.post('/forgot-password', validate(forgotPasswordSchema), authController.forgotPassword);
 

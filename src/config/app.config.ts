@@ -28,7 +28,7 @@ const cors: CorsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
 };
 
-const helemt: HelmetOptions = {
+const helmet: HelmetOptions = {
   contentSecurityPolicy: env.isDev,
   crossOriginEmbedderPolicy: env.isDev,
 };
@@ -45,6 +45,6 @@ const _compression: CompressionOptions = {
 };
 export const config = {
   cors,
-  helemt,
+  helmet,
   compression: _compression,
 };

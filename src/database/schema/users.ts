@@ -1,7 +1,16 @@
 import { AuthProviderType, AvailableAuthProviders, AvailableUserRoles } from '@/constants/auth';
 import { timestamps } from '@/utils/timestamps-helper';
-import { relations } from 'drizzle-orm';
-import { boolean, pgEnum, pgTable, text, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core';
+import { relations, sql } from 'drizzle-orm';
+import {
+  boolean,
+  check,
+  pgEnum,
+  pgTable,
+  text,
+  uniqueIndex,
+  uuid,
+  varchar,
+} from 'drizzle-orm/pg-core';
 import { sessions } from './sessions';
 import { userLocations } from './user-locations';
 import { verifications } from './verifications';
@@ -30,6 +39,10 @@ export const users = pgTable(
   (table) => [
     uniqueIndex('email_idx').on(table.email),
     uniqueIndex('provider_user_idx').on(table.provider, table.providerId),
+    check(
+      'custom_auth_password_check',
+      sql`${table.provider} != 'custom' OR ${table.password} IS NOT NULL`
+    ),
   ]
 );
 

@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD CONSTRAINT "custom_auth_password_check" CHECK ("users"."provider" != 'custom' OR "users"."password" IS NOT NULL);
