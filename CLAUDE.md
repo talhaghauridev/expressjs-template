@@ -9,12 +9,14 @@ This is an Express.js REST API template built with TypeScript, featuring compreh
 ## Development Commands
 
 ### Running the Application
+
 - `npm run dev` - Start development server with hot reload (uses tsx + nodemon)
 - `npm start` - Run production build (requires prior build)
 - `npm run build` - Compile TypeScript to JavaScript in `dist/` directory
 - `npm run watch` - Watch mode for TypeScript compilation
 
 ### Database Operations
+
 - `npm run db:generate` - Generate Drizzle migrations from schema changes
 - `npm run db:migrate` - Apply pending migrations to database
 - `npm run db:push` - Push schema directly to database (bypass migrations)
@@ -22,25 +24,30 @@ This is an Express.js REST API template built with TypeScript, featuring compreh
 - `npm run db:studio` - Open Drizzle Studio for database inspection
 
 ### Code Quality
+
 - `npm run format` - Format code with Prettier
 - `npm run format:check` - Check code formatting without changes
 
 ## Architecture
 
 ### Entry Point & Server Setup
+
 - `src/index.ts` - Application entry point, starts Express server on configured PORT
 - `src/app.ts` - Express app configuration with middleware stack
 - `src/env.ts` - Environment variable validation using Zod schema
 
 ### Configuration
+
 - `src/config/app.config.ts` - Centralizes CORS, Helmet, and Compression middleware configuration
 - `src/config/passport.config.ts` - Passport.js strategies for Google and Facebook OAuth
 - `drizzle.config.ts` - Drizzle ORM configuration for database migrations
 
 ### Path Aliases
+
 TypeScript path alias `@/*` maps to `src/*`. After build, use `tsc-alias` to resolve aliases in compiled output.
 
 ### Request Flow
+
 1. Request enters through Express middleware stack (helmet, compression, CORS, morgan, body parsing)
 2. Routes mounted at `/api/v1` prefix (see `src/routes/`)
 3. Validation middleware (`validate.middleware.ts`) uses Zod schemas from `src/validators/`
@@ -52,6 +59,7 @@ TypeScript path alias `@/*` maps to `src/*`. After build, use `tsc-alias` to res
 9. Errors caught by `errorMiddleware` and formatted consistently
 
 ### Database Layer
+
 - **Database Connection**: `src/database/db.ts` - PostgreSQL via `postgres` + Drizzle ORM
 - **Schema Location**: `src/database/schema/` - Drizzle schema files:
   - `users.ts` - User accounts
@@ -63,6 +71,7 @@ TypeScript path alias `@/*` maps to `src/*`. After build, use `tsc-alias` to res
 - **Repositories**: Pattern used - each entity has dedicated repository in `src/repositories/`
 
 ### Authentication System
+
 - **JWT-based**: Access tokens (JWT) + Refresh tokens (UUID stored in sessions table)
 - **Local Auth**: Email/password with bcrypt hashing
 - **OAuth Providers**: Google and Facebook via Passport.js
@@ -71,6 +80,7 @@ TypeScript path alias `@/*` maps to `src/*`. After build, use `tsc-alias` to res
 - **Middleware**: `authenticate` middleware in `src/middlewares/auth.middleware.ts`
 
 ### Utility Modules
+
 - `src/utils/api-error.ts` - ApiError class for standardized error handling
 - `src/utils/api-response.ts` - ApiResponse class for consistent JSON responses
 - `src/utils/async-handler.ts` - Wrapper for async route handlers
@@ -81,7 +91,9 @@ TypeScript path alias `@/*` maps to `src/*`. After build, use `tsc-alias` to res
 - `src/utils/send-email.ts` - Nodemailer email sending
 
 ### Environment Variables
+
 All environment variables validated in `src/env.ts` using Zod. Required variables include:
+
 - Database: `DATABASE_URL`
 - JWT secrets: `ACCESS_TOKEN_SECRET`, `REFRESH_TOKEN_SECRET`
 - OAuth credentials: Google and Facebook client IDs/secrets
@@ -92,12 +104,14 @@ All environment variables validated in `src/env.ts` using Zod. Required variable
 See `.env.example` for complete list.
 
 ### Error Handling
+
 - All errors flow through `src/middlewares/error.middleware.ts`
 - PostgreSQL errors mapped to user-friendly messages via `handlePostgresError()`
 - Custom ApiError class supports common HTTP status codes
 - Development mode includes stack traces in error responses
 
 ### Middleware Stack Order (src/app.ts)
+
 1. Helmet (security headers)
 2. JSON/URL-encoded body parsers
 3. Compression
@@ -110,27 +124,34 @@ See `.env.example` for complete list.
 ## Key Patterns
 
 ### Repository Pattern
+
 Repositories encapsulate all database queries. When adding new entities:
+
 1. Create schema in `src/database/schema/`
 2. Export from `src/database/schema/index.ts`
 3. Create repository in `src/repositories/`
 4. Use repository methods in services
 
 ### Validation Pattern
+
 Request validation uses Zod schemas defined in `src/validators/`. Apply via `validate()` middleware:
+
 ```typescript
 router.post('/endpoint', validate(mySchema), controller.handler);
 ```
 
 ### Response Patterns
+
 - Success: `ApiResponse.success(res, data, message)`
 - Created: `ApiResponse.created(res, data, message)`
 - Error: `throw ApiError.badRequest(message)` (caught by error middleware)
 
 ### Async Handlers
+
 Use `asyncHandler` wrapper from `src/utils/async-handler.ts` to automatically catch async errors in controllers.
 
 ## Adding New Routes
+
 1. Create route file in `src/routes/`
 2. Import and mount in `src/routes/index.ts`
 3. Create validator schemas in `src/validators/`
@@ -139,6 +160,7 @@ Use `asyncHandler` wrapper from `src/utils/async-handler.ts` to automatically ca
 6. Create repository if new database entity involved
 
 ## Session Management
+
 - Sessions table stores refresh tokens with expiry timestamps
 - Each login creates new session with device/location info
 - Logout invalidates specific session
